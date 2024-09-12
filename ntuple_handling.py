@@ -50,9 +50,6 @@ hist_all_t = ROOT.TH1F("all_t","Number of jets in pT ranges for fCPV < 1",50,10.
 hist_double_1_t = ROOT.TH1F("double_1_t","Number of jets in pT ranges that are double matched for fCPV = 1",50,10.e3,40.e3)
 hist_all_1_t = ROOT.TH1F("all_1_t","Number of jets in pT ranges for fCPV = 1",50,10.e3,40.e3)
 
-hist_num_deltaR = ROOT.TH1F("num_deltaR","Number of jets in pT ranges for fCPV < 1 and dR < 0.4 with any neighbouring jet",50,10.e3,40.e3)
-hist_all_fCPV = ROOT.TH1F("all_fCPV","Number of jets in pT ranges for fCPV < 1",50,10.e3,40.e3)
-
 ranges = [[20.e3, 25.e3], [25.e3, 30.e3], [30.e3, 40.e3]]
 hists_pt_responses = []
 for i in ranges:
@@ -92,58 +89,7 @@ for i in range(num_entries):
 	if i%2000 == 0:
 		print(f"{i} / {num_entries}")
 
-	inTree.GetEntry(i)	
-
-	num = inTree.event_eventNumber
-	if prev == -1:
-		prev = num
-
-	# If new event and jets_temp contains data, process the previous event
-	if prev != num and len(jets_temp) > 0:
-		if len(jets_temp) == 1:
-			hist_num_deltaR.Fill(jets_temp[0][0])
-			jets_temp = []
-			prev = num
-			continue
-
-		delta_r_matrix = [[999 for _ in range(len(jets_temp))] for _ in range(len(jets_temp))]
-		jets_properties = np.array(jets_temp)
-		phis = jets_properties[:, 2]
-		etas = jets_properties[:, 1]
-
-		zipped_list = [[float(e), float(p)] for e, p in zip(etas, phis)]
-		for j in range(len(jets_temp)):
-			for k in range(0, len(jets_temp)): #0 or j+1
-				if j == k or jets_temp[j][3] == jets_temp[k][3]:
-					continue
-
-				eta1, phi1 = zipped_list[j]
-				eta2, phi2 = zipped_list[k]
-				delta_r = calc_delta_r(phi1, phi2, eta1, eta2)
-				delta_r_matrix[j][k] = delta_r
-
-		# Process the delta_r_matrix values
-		for j in range(len(delta_r_matrix)):
-			pt = jets_temp[j][0]
-			count = sum([1 for x in delta_r_matrix[j] if x < 0.4])
-			if count == 0:
-				hist_num_deltaR.Fill(pt)
-
-		# Reset for the next event
-		jets_temp = []
-		prev = num
-
-	# For each jet in the current event, append to jets_temp if condition met
-	for j in range(inTree.jet_pt.size()):
-		if inTree.jet_ptFrac_dR04.at(j) < 1:
-			jet = [
-				inTree.jet_pt.at(j),
-				inTree.jet_eta.at(j),
-				inTree.jet_phi.at(j),
-				inTree.jet_originVertexIndex.at(j)
-			]
-			jets_temp.append(jet)
-			hist_all_fCPV.Fill(jet[0])
+	inTree.GetEntry(i)
 
 	# Process the truth and reco jets in each vertex
 	for j in range(inTree.jet_truthPt.size()):
@@ -192,7 +138,7 @@ for i in range(num_entries):
 						if is_pileup_matched and not is_truth_matched:
 							hists_pt_responses[k][5].Fill(ratio_p)
 						if is_pileup_matched and is_truth_matched:
-							hists_pt_responses[k][7].Fill(ratio_both)
+							hists_pt_responses[k][8].Fill(ratio_both)
 
 					elif jet_pt_frac < 1: # fCPV < 1
 						if is_truth_matched and not is_pileup_matched:
@@ -200,7 +146,7 @@ for i in range(num_entries):
 						if is_pileup_matched and not is_truth_matched:
 							hists_pt_responses[k][4].Fill(ratio_p)
 						if is_pileup_matched and is_truth_matched:
-							hists_pt_responses[k][8].Fill(ratio_both)
+							hists_pt_responses[k][7].Fill(ratio_both)
 
 		# Fill the 1D fCPV histograms for: truth-matched, pileup-matched, and unfiltered
 		hist_fCPV_unf.Fill(jet_pt_frac)
@@ -291,8 +237,5 @@ hist_all_t.Write()
 
 hist_double_1_t.Write()
 hist_all_1_t.Write()
-
-hist_num_deltaR.Write()
-hist_all_fCPV.Write()
 
 outFile.Close()
