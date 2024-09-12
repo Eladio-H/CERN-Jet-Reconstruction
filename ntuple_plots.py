@@ -99,303 +99,79 @@ def fit_gaus(hist):
 
 
 # START PLOTTING
-canvas = ROOT.TCanvas("canvas","canvas",1080,650)
+canvas = ROOT.TCanvas("canvas","canvas",1300,800)
 canvas.cd()
 canvas.Print(outFileName+"[")
 text_size = 0.05
 
-# PLOT PROBABILITY THAT THERE IS NO JET WITHIN dR < 0.4 OF A JET OF fCPV < 1
-efficiency = ROOT.TEfficiency(hist_num_deltaR, hist_all_fCPV)
-efficiency.SetTitle("Frequency of there being no other jets within dR < 0.4 for a reco jet of fCPV < 1; reco pT; Probability")
-canvas.SetLogx(False)
-canvas.SetLogy(False)
-efficiency.SetLineColor(ROOT.kBlack)
-efficiency.Draw("AP")
-canvas.Print(outFileName)
 
-# PLOT LEADING JET VS SUBLEADING JET FOR DOUBLE MATCHED JETS
+# PLOTTING FUNCTION
+def plot(hist, fit, title, colour, d2, teff, xt, yt, description):
+    topPad = ROOT.TPad("topPad", "Top Pad", 0, 0.1, 1, 1.0)  # Upper 90% for the plot
+    bottomPad = ROOT.TPad("bottomPad", "Bottom Pad", 0, 0.0, 1, 0.1)  # Lower 10% for the text
+    topPad.SetBottomMargin(0.15)
+    topPad.Draw()
+    topPad.cd()
 
-# Any fCPV
-canvas.SetLogx(False)
-canvas.SetLogy(False)
-hist_pt_comparison_fCPV_any.GetXaxis().SetTitle("p{T} of Leading Jet")
-hist_pt_comparison_fCPV_any.GetYaxis().SetTitle("p{T} of Subleading Jet")
-hist_pt_comparison_fCPV_any.SetTitle("Correlation between Leading Jet p_{T} and Subleading Jet p_{T} for any fCPV")
-hist_pt_comparison_fCPV_any.SetStats(0)
-hist_pt_comparison_fCPV_any.Draw("colz")
-canvas.Print(outFileName)
-
-# fCPV = 1
-canvas.SetLogx(False)
-canvas.SetLogy(False)
-hist_pt_comparison_fCPV_1.GetXaxis().SetTitle("p{T} of Leading Jet")
-hist_pt_comparison_fCPV_1.GetYaxis().SetTitle("p{T} of Subleading Jet")
-hist_pt_comparison_fCPV_1.SetTitle("Correlation between Leading Jet p_{T} and Subleading Jet p_{T} for fCPV = 1")
-hist_pt_comparison_fCPV_1.SetStats(0)
-hist_pt_comparison_fCPV_1.Draw("colz")
-canvas.Print(outFileName)
-
-# fCPV < 1
-canvas.SetLogx(False)
-canvas.SetLogy(False)
-hist_pt_comparison_fCPV.GetXaxis().SetTitle("p{T} of Leading Jet")
-hist_pt_comparison_fCPV.GetYaxis().SetTitle("p{T} of Subleading Jet")
-hist_pt_comparison_fCPV.SetTitle("Correlation between Leading Jet p_{T} and Subleading Jet p_{T} for fCPV < 1")
-hist_pt_comparison_fCPV.SetStats(0)
-hist_pt_comparison_fCPV.Draw("colz")
-canvas.Print(outFileName)
-
-
-# PLOT PROBABILITY THAT ANY MATCHED JET IS DOUBLE MATCHED ACCORDING TO pT
-efficiency_any = ROOT.TEfficiency(hist_double_any, hist_all_any)
-efficiency = ROOT.TEfficiency(hist_double, hist_all)
-efficiency_1 = ROOT.TEfficiency(hist_double_1, hist_all_1)
-
-efficiency_any_t = ROOT.TEfficiency(hist_double_any_t, hist_all_any_t)
-efficiency_t = ROOT.TEfficiency(hist_double_t, hist_all_t)
-efficiency_1_t = ROOT.TEfficiency(hist_double_1_t, hist_all_1_t)
-
-efficiency_any.SetTitle("Probability of a matched jet being double matched for any fCPV; reco pT; Probability")
-efficiency.SetTitle("Probability of a matched jet being double matched for fCPV < 1; reco pT; Probability")
-efficiency_1.SetTitle("Probability of a matched jet being double matched for fCPV = 1; reco pT; Probability")
-
-efficiency_any_t.SetTitle("Probability of a matched jet being double matched for any fCPV; total truth-matched pT; Probability")
-efficiency_t.SetTitle("Probability of a matched jet being double matched for fCPV < 1; total truth-matched pT; Probability")
-efficiency_1_t.SetTitle("Probability of a matched jet being double matched for fCPV = 1; total truth-matched pT; Probability")
-
-# Any fCPV
-
-# according to reco pT
-canvas.SetLogx(False)
-canvas.SetLogy(False)
-efficiency_any.SetLineColor(ROOT.kRed)
-efficiency_any.Draw("AP")
-canvas.Print(outFileName)
-
-# according to truth pT
-canvas.SetLogx(False)
-canvas.SetLogy(False)
-efficiency_any_t.SetLineColor(ROOT.kRed)
-efficiency_any_t.Draw("AP")
-canvas.Print(outFileName)
-
-# fCPV < 1
-
-# according to reco pT
-canvas.SetLogx(False)
-canvas.SetLogy(False)
-efficiency.SetLineColor(ROOT.kBlue)
-efficiency.Draw("AP")
-canvas.Print(outFileName)
-
-# according to truth pT
-canvas.SetLogx(False) 
-canvas.SetLogy(False)
-efficiency_t.SetLineColor(ROOT.kBlue)
-efficiency_t.Draw("AP")
-canvas.Print(outFileName) 
-
-# fCPV = 1
-
-# according to reco pT
-canvas.SetLogx(False)
-canvas.SetLogy(False)
-efficiency_1.SetLineColor(ROOT.kGreen)
-efficiency_1.Draw("AP")
-canvas.Print(outFileName)
-
-# according to truth pT
-canvas.SetLogx(False)
-canvas.SetLogy(False)
-efficiency_1_t.SetLineColor(ROOT.kGreen)
-efficiency_1_t.Draw("AP")
-canvas.Print(outFileName) 
-
-
-
-# PLOT pT RESPONSE PLOTS
-for j in range(len(ranges)):
-    group = hists_pt_responses[j]
-    range_str = "Range: " + str(ranges[j][0]) + "-" + str(ranges[j][1]) + " MeV"
-
-    either_or = group[0].Clone("either_or")
-    either_or.Add(group[3])
-
-    # ANY fCPV
-
-    # only truth-matched
     canvas.SetLogx(False)
     canvas.SetLogy(False)
-    group[0].Scale(1./group[0].Integral())
-    group[0].SetLineColor(ROOT.kBlack)
-    group[0].SetLineWidth(2)
-    group[0].SetTitle("pT response: p{T} of reco jets of any fCPV / p{T} of matching truth jet - " + range_str)
-    group[0].GetXaxis().SetTitle("p{T} response of leading jet")
-    group[0].GetYaxis().SetTitle("Fraction of events")
-    group[0].SetStats(0)
-    fit_gaus(group[0])
+    if teff:
+        hist.SetTitle(title)
+        hist.SetLineColor(colour)
+        hist.Draw("AP")
+
+    elif d2:
+        hist.SetTitle(title)
+        hist.SetStats(0)
+        hist.GetXaxis().SetTitle(xt)
+        hist.GetYaxis().SetTitle(yt)
+        hist.Draw("colz")
+
+    else:
+        hist.SetTitle(title)
+        hist.SetStats(0)
+        hist.GetXaxis().SetTitle(xt)
+        hist.GetYaxis().SetTitle(yt)
+        hist.SetLineColor(colour)
+        hist.SetLineWidth(2)
+        hist.Draw()
+
+        if fit:
+            fit_gaus(hist)
+
+
+    # Write description
+    canvas.cd()  
+    bottomPad.SetTopMargin(0.0)  # No top margin for bottom pad
+    bottomPad.Draw()  # Draw the bottom pad on the canvas
+    bottomPad.cd()  # Make the bottom pad current
+
+    # Add text in the bottom pad using TLatex
+    latex = ROOT.TLatex()
+    latex.SetNDC()
+    latex.SetTextSize(0.3)  # Larger text size for clarity
+    latex.SetTextAlign(22)  # Centered text
+    latex.DrawLatex(0.5, 0.85, description)
+
+    canvas.cd()
+
     canvas.Print(outFileName)
-
-    # only pileup-matched
-    canvas.SetLogx(False)
-    canvas.SetLogy(False)
-    group[3].Scale(1./group[3].Integral())
-    group[3].SetLineColor(ROOT.kBlack)
-    group[3].SetLineWidth(2)
-    group[3].SetTitle("p{T} response: p{T} of reco jets of any fCPV / p{T} of matching inTimeTruthJet - " + range_str)
-    group[3].GetXaxis().SetTitle("p{T} response of leading jet")
-    group[3].GetYaxis().SetTitle("Fraction of events")
-    group[3].SetStats(0)
-    fit_gaus(group[3])
-    canvas.Print(outFileName)
-
-    # matched
-    canvas.SetLogx(False)
-    canvas.SetLogy(False)
-    either_or.Scale(1./either_or.Integral())
-    either_or.SetLineColor(ROOT.kBlack)
-    either_or.SetLineWidth(2)
-    either_or.SetTitle("p{T} response: p{T} of reco jets of any fCPV / p{T} of matching truth jet OR inTimeTruthJet - " + range_str)
-    either_or.GetXaxis().SetTitle("p{T} response of leading jet")
-    either_or.GetYaxis().SetTitle("Fraction of events")
-    either_or.SetStats(0)
-    fit_gaus(either_or)
-    canvas.Print(outFileName)
-
-    # double matched
-    canvas.SetLogx(False)
-    canvas.SetLogy(False)
-    group[6].Scale(1./group[6].Integral())
-    group[6].SetLineColor(ROOT.kBlack)
-    group[6].SetLineWidth(2)
-    group[6].SetTitle("p{T} response: p{T} of reco jets of any fCPV / p{T} sum of BOTH matching truth jets - " + range_str)
-    group[6].GetXaxis().SetTitle("p{T} response of leading jet")
-    group[6].GetYaxis().SetTitle("Fraction of events")
-    group[6].SetStats(0)
-    fit_gaus(group[6])
-    canvas.Print(outFileName)
-
-    # fCPV = 1
-    either_or = group[2].Clone("either_or")
-    either_or.Add(group[5])
-
-    # only truth-matched
-    canvas.SetLogx(False)
-    canvas.SetLogy(False)
-    group[2].Scale(1./group[2].Integral())
-    group[2].SetLineColor(ROOT.kBlack)
-    group[2].SetLineWidth(2)
-    group[2].SetTitle("p{T} response: p{T} of reco jets of fCPV = 1 / p{T} of matching truth jet - " + range_str)
-    group[2].GetXaxis().SetTitle("p{T} response of leading jet")
-    group[2].GetYaxis().SetTitle("Fraction of events")
-    group[2].SetStats(0)
-    fit_gaus(group[2])
-    canvas.Print(outFileName)
-
-    # only pileup-matched
-    canvas.SetLogx(False)
-    canvas.SetLogy(False)
-    group[5].Scale(1./group[5].Integral())
-    group[5].SetLineColor(ROOT.kBlack)
-    group[5].SetLineWidth(2)
-    group[5].SetTitle("p{T} response: p{T} of reco jets of fCPV = 1 / p{T} of matching inTimeTruthJet - " + range_str)
-    group[5].GetXaxis().SetTitle("p{T} response of leading jet")
-    group[5].GetYaxis().SetTitle("Fraction of events")
-    group[5].SetStats(0)
-    fit_gaus(group[5])
-    canvas.Print(outFileName)
-
-    # matched
-    canvas.SetLogx(False)
-    canvas.SetLogy(False)
-    either_or.Scale(1./either_or.Integral())
-    either_or.SetLineColor(ROOT.kBlack)
-    either_or.SetLineWidth(2)
-    either_or.SetTitle("p{T} response: p{T} of reco jets of fCPV = 1 / p{T} of matching truth jet OR inTimeTruthJet - " + range_str)
-    either_or.GetXaxis().SetTitle("p{T} response of leading jet")
-    either_or.GetYaxis().SetTitle("Fraction of events")
-    either_or.SetStats(0)
-    fit_gaus(either_or)
-    canvas.Print(outFileName)
-
-    # double matched
-    canvas.SetLogx(False)
-    canvas.SetLogy(False)
-    group[8].Scale(1./group[8].Integral())
-    group[8].SetLineColor(ROOT.kBlack)
-    group[8].SetLineWidth(2)
-    group[8].SetTitle("p{T} response: p{T} of reco jets of fCPV = 1 / p{T} sum of BOTH matching truth jets - " + range_str)
-    group[8].GetXaxis().SetTitle("p{T} response of leading jet")
-    group[8].GetYaxis().SetTitle("Fraction of events")
-    group[8].SetStats(0)
-    fit_gaus(group[8])
-    canvas.Print(outFileName)
-
-    # fCPV < 1
-    either_or = group[1].Clone("either_or")
-    either_or.Add(group[4])
-
-    # only truth-matched
-    canvas.SetLogx(False)
-    canvas.SetLogy(False)
-    group[1].Scale(1./group[1].Integral())
-    group[1].SetLineColor(ROOT.kBlack)
-    group[1].SetLineWidth(2)
-    group[1].SetTitle("p{T} response: p{T} of leading reco jet of fCPV < 1 / p{T} of matching truth jet - " + range_str)
-    group[1].GetXaxis().SetTitle("p{T} response of leading jet")
-    group[1].GetYaxis().SetTitle("Fraction of events")
-    group[1].SetStats(0)
-    fit_gaus(group[1])
-    canvas.Print(outFileName)
-
-    # only pileup-matched
-    canvas.SetLogx(False)
-    canvas.SetLogy(False)
-    group[4].Scale(1./group[4].Integral())
-    group[4].SetLineColor(ROOT.kBlack)
-    group[4].SetLineWidth(2)
-    group[4].SetTitle("p{T} response: p{T} of leading reco jet of fCPV < 1 / p{T} of matching inTimeTruthJet - " + range_str)
-    group[4].GetXaxis().SetTitle("p{T} response of leading jet")
-    group[4].GetYaxis().SetTitle("Fraction of events")
-    group[4].SetStats(0)
-    fit_gaus(group[4])
-    canvas.Print(outFileName)
-
-    # matched
-    canvas.SetLogx(False)
-    canvas.SetLogy(False)
-    either_or.Scale(1./either_or.Integral())
-    either_or.SetLineColor(ROOT.kBlack)
-    either_or.SetLineWidth(2)
-    either_or.SetTitle("p{T} response: p{T} of leading reco jet of fCPV < 1 / p{T} of matching truth jet OR inTimeTruthJet - " + range_str)
-    either_or.GetXaxis().SetTitle("p{T} response of leading jet")
-    either_or.GetYaxis().SetTitle("Fraction of events")
-    either_or.SetStats(0)
-    fit_gaus(either_or)
-    canvas.Print(outFileName)
-
-    # double matched
-    canvas.SetLogx(False)
-    canvas.SetLogy(False)
-    group[7].Scale(1./group[7].Integral())
-    group[7].SetLineColor(ROOT.kBlack)
-    group[7].SetLineWidth(2)
-    group[7].SetTitle("p{T} response: p{T} of leading reco jet of fCPV < 1 / p{T} sum of BOTH matching truth jets - " + range_str)
-    group[7].GetXaxis().SetTitle("p{T} response of leading jet")
-    group[7].GetYaxis().SetTitle("Fraction of events")
-    group[7].SetStats(0)
-    fit_gaus(group[7])
-    canvas.Print(outFileName)
-
 
 
 # PLOT FCPV COMPARISON HISTOGRAM
 canvas.SetLogx(False)
 canvas.SetLogy(False)
+
+topPad = ROOT.TPad("topPad", "Top Pad", 0, 0.1, 1, 1.0)  # Upper 90% for the plot
+bottomPad = ROOT.TPad("bottomPad", "Bottom Pad", 0, 0.0, 1, 0.1)  # Lower 10% for the text
+topPad.SetBottomMargin(0.15)
+topPad.Draw()
+topPad.cd()
+
 hist_cFPV_unf.SetLineColor(ROOT.kRed)
 hist_cFPV_unf.SetLineWidth(2)
 hist_cFPV_unf.GetXaxis().SetTitle("fCPV of reco jets")
-hist_cFPV_unf.GetYaxis().SetTitle("Scaled number of events")
+hist_cFPV_unf.GetYaxis().SetTitle("Fraction of events")
 hist_cFPV_unf.GetXaxis().SetLabelSize(text_size)
 hist_cFPV_unf.SetStats(0)
 hist_cFPV_unf.Scale(1./hist_cFPV_unf.Integral())
@@ -428,7 +204,7 @@ hist_cFPV_truth_pileup.Draw("same")
 hist_fCPV_truth_pileup_or.SetLineColor(ROOT.kOrange)
 hist_fCPV_truth_pileup_or.SetLineWidth(2)
 hist_fCPV_truth_pileup_or.GetXaxis().SetTitle("fCPV of truth- and pileup-matched reco jets")
-hist_fCPV_truth_pileup_or.GetYaxis().SetTitle("Scaled number of events")
+hist_fCPV_truth_pileup_or.GetYaxis().SetTitle("Fraction of events")
 hist_fCPV_truth_pileup_or.GetXaxis().SetLabelSize(text_size)
 hist_fCPV_truth_pileup_or.SetStats(0)
 hist_fCPV_truth_pileup_or.Scale(1./hist_fCPV_truth_pileup_or.Integral())
@@ -442,6 +218,210 @@ legend.AddEntry(hist_fCPV_truth_pileup_or)
 legend.SetTextSize(0.025)
 legend.SetBorderSize(0)
 legend.Draw("same")
+
+canvas.cd()  
+bottomPad.SetTopMargin(0.0)  # No top margin for bottom pad
+bottomPad.Draw()  # Draw the bottom pad on the canvas
+bottomPad.cd()  # Make the bottom pad current
+
+# Add text in the bottom pad using TLatex
+latex = ROOT.TLatex()
+latex.SetNDC()
+latex.SetTextSize(0.3)  # Larger text size for clarity
+latex.SetTextAlign(22)  # Centered text
+latex.DrawLatex(0.5, 0.85, "Filled with fCPV of reco jets, categorised by to what extent they are matched")
+
+canvas.cd()
+
 canvas.Print(outFileName)
 
+# PLOT LEADING JET VS SUBLEADING JET FOR DOUBLE MATCHED JETS
+
+# Any fCPV
+description = "For double matched (GPV / Pileup) reco jets of any fCPV: Filled with the leading vs subleading matched jet pT"
+title = "Correlation between Leading Jet p_{T} and Subleading Jet p_{T} for any fCPV"
+xt = "p{T} of Leading Jet"
+yt = "p{T} of Subleading Jet"
+plot(hist_pt_comparison_fCPV_any, False, title, ROOT.kBlack, True, False, xt, yt, description)
+
+# fCPV = 1
+description = "For double matched (GPV / Pileup) reco jets of fCPV = 1: Filled with the leading vs subleading matched jet pT"
+title = "Correlation between Leading Jet p_{T} and Subleading Jet p_{T} for fCPV = 1"
+xt = "p{T} of Leading Jet"
+yt = "p{T} of Subleading Jet"
+plot(hist_pt_comparison_fCPV_any, False, title, ROOT.kBlack, True, False, xt, yt, description)
+
+# fCPV < 1
+description = "For double matched (GPV / Pileup) reco jets of fCPV < 1: Filled with the leading vs subleading matched jet pT"
+title = "Correlation between Leading Jet p_{T} and Subleading Jet p_{T} for fCPV < 1"
+xt = "p{T} of Leading Jet"
+yt = "p{T} of Subleading Jet"
+plot(hist_pt_comparison_fCPV_any, False, title, ROOT.kBlack, True, False, xt, yt, description)
+
+
+# PLOT pT RESPONSE PLOTS
+for j in range(len(ranges)):
+    group = hists_pt_responses[j]
+    range_str = "Range: " + str(ranges[j][0]) + "-" + str(ranges[j][1]) + " MeV"
+
+    either_or = group[0].Clone("either_or")
+    either_or.Add(group[3])
+
+    # ANY fCPV
+
+    # only truth-matched
+    group[0].Scale(1./group[0].Integral())
+    title = "pT response: p{T} of reco jets of any fCPV / p{T} of matching truth jet - " + range_str
+    description = "Filled with the pT response of only GPV-matched reco jets of any fCPV - " + range_str
+    xt = "p{T} response of leading jet"
+    yt = "Fraction of events"
+    plot(group[0], True, title, ROOT.kBlack, False, False, xt, yt, description)
+
+    # only pileup-matched
+    group[3].Scale(1./group[3].Integral())
+    title = "pT response: p{T} of reco jets of any fCPV / p{T} of matching inTimeTruthJet - " + range_str
+    description = "Filled with the pT response of only pileup-matched reco jets of any fCPV - " + range_str
+    xt = "p{T} response of leading jet"
+    yt = "Fraction of events"
+    plot(group[3], True, title, ROOT.kBlack, False, False, xt, yt, description)
+
+    # matched
+    canvas.SetLogx(False)
+    either_or.Scale(1./either_or.Integral())
+    title = "pT response: p{T} of reco jets of any fCPV / p{T} of matching truth jet OR inTimeTruthJet - " + range_str
+    description = "Filled with the pT response of single-matched (either GPV or pileup) reco jets of any fCPV - " + range_str
+    xt = "p{T} response of leading jet"
+    yt = "Fraction of events"
+    plot(either_or, True, title, ROOT.kBlack, False, False, xt, yt, description)
+
+    # double matched
+    group[6].Scale(1./group[6].Integral())
+    title = "pT response: p{T} of reco jets of any fCPV / p{T} of  BOTH matching truth jets - " + range_str
+    description = "Filled with the pT response of double-matched reco jets of any fCPV - " + range_str
+    xt = "p{T} response of leading jet"
+    yt = "Fraction of events"
+    plot(group[6], True, title, ROOT.kBlack, False, False, xt, yt, description)
+
+    # fCPV = 1
+    either_or = group[2].Clone("either_or")
+    either_or.Add(group[5])
+
+    # only truth-matched
+    group[2].Scale(1./group[2].Integral())
+    title = "pT response: p{T} of reco jets of fCPV = 1 / p{T} of matching truth jet - " + range_str
+    description = "Filled with the pT response of only GPV-matched reco jets of fCPV = 1 - " + range_str
+    xt = "p{T} response of leading jet"
+    yt = "Fraction of events"
+    plot(group[2], True, title, ROOT.kBlack, False, False, xt, yt, description)
+
+    # only pileup-matched
+    group[5].Scale(1./group[5].Integral())
+    title = "pT response: p{T} of reco jets of fCPV = 1 / p{T} of matching inTimeTruthJet - " + range_str
+    description = "Filled with the pT response of only pileup-matched reco jets of fCPV = 1 - " + range_str
+    xt = "p{T} response of leading jet"
+    yt = "Fraction of events"
+    plot(group[5], True, title, ROOT.kBlack, False, False, xt, yt, description)
+
+    # matched
+    canvas.SetLogx(False)
+    either_or.Scale(1./either_or.Integral())
+    title = "pT response: p{T} of reco jets of fCPV = 1 / p{T} of matching truth jet OR inTimeTruthJet - " + range_str
+    description = "Filled with the pT response of single-matched (either GPV or pileup) reco jets of fCPV = 1 - " + range_str
+    xt = "p{T} response of leading jet"
+    yt = "Fraction of events"
+    plot(either_or, True, title, ROOT.kBlack, False, False, xt, yt, description)
+
+    # double matched
+    group[8].Scale(1./group[8].Integral())
+    title = "pT response: p{T} of reco jets of fCPV = 1 / p{T} of  BOTH matching truth jets - " + range_str
+    description = "Filled with the pT response of double-matched reco jets of fCPV = 1 - " + range_str
+    xt = "p{T} response of leading jet"
+    yt = "Fraction of events"
+    plot(group[8], True, title, ROOT.kBlack, False, False, xt, yt, description)
+
+    # fCPV < 1
+    either_or = group[1].Clone("either_or")
+    either_or.Add(group[4])
+
+    # only truth-matched
+    group[1].Scale(1./group[1].Integral())
+    title = "pT response: p{T} of reco jets of fCPV < 1 / p{T} of matching truth jet - " + range_str
+    description = "Filled with the pT response of only GPV-matched reco jets of fCPV < 1 - " + range_str
+    xt = "p{T} response of leading jet"
+    yt = "Fraction of events"
+    plot(group[1], True, title, ROOT.kBlack, False, False, xt, yt, description)
+
+    # only pileup-matched
+    group[4].Scale(1./group[4].Integral())
+    title = "pT response: p{T} of reco jets of fCPV < 1 / p{T} of matching inTimeTruthJet - " + range_str
+    description = "Filled with the pT response of only pileup-matched reco jets of fCPV < 1 - " + range_str
+    xt = "p{T} response of leading jet"
+    yt = "Fraction of events"
+    plot(group[4], True, title, ROOT.kBlack, False, False, xt, yt, description)
+
+    # matched
+    canvas.SetLogx(False)
+    either_or.Scale(1./either_or.Integral())
+    title = "pT response: p{T} of reco jets of fCPV < 1 / p{T} of matching truth jet OR inTimeTruthJet - " + range_str
+    description = "Filled with the pT response of single-matched (either GPV or pileup) reco jets of fCPV < 1 - " + range_str
+    xt = "p{T} response of leading jet"
+    yt = "Fraction of events"
+    plot(either_or, True, title, ROOT.kBlack, False, False, xt, yt, description)
+
+    # double matched
+    group[7].Scale(1./group[7].Integral())
+    title = "pT response: p{T} of reco jets of fCPV < 1 / p{T} of  BOTH matching truth jets - " + range_str
+    description = "Filled with the pT response of double-matched reco jets of fCPV < 1 - " + range_str
+    xt = "p{T} response of leading jet"
+    yt = "Fraction of events"
+    plot(group[7], True, title, ROOT.kBlack, False, False, xt, yt, description)
+
+
+# PLOT PROBABILITY THAT ANY MATCHED JET IS DOUBLE MATCHED ACCORDING TO pT
+
+# Any fCPV
+
+# according to reco pT
+efficiency = ROOT.TEfficiency(hist_double_any, hist_all_any)
+description = "Filled with fraction of: no. of double matched jets / total no. of matched jets of any fCPV; for each reco pT bin"
+title = "Probability of a matched jet being double matched for any fCPV; reco pT; Probability"
+plot(efficiency, False, title, ROOT.kRed, False, True, "", "", description)
+
+# according to truth pT
+efficiency = ROOT.TEfficiency(hist_double_any_t, hist_all_any_t)
+description = "Filled with fraction of: no. of double matched jets / total no. of matched jets of any fCPV; for each total truth-matched pT bin"
+title = "Probability of a matched jet being double matched for any fCPV; total truth-matched pT; Probability"
+plot(efficiency, False, title, ROOT.kRed, False, True, "", "", description)
+
+
+# fCPV < 1
+
+# according to reco pT
+efficiency = ROOT.TEfficiency(hist_double, hist_all)
+description = "Filled with fraction of: no. of double matched jets / total no. of matched jets of fCPV < 1; for each reco pT bin"
+title = "Probability of a matched jet being double matched for fCPV < 1; reco pT; Probability"
+plot(efficiency, False, title, ROOT.kBlue, False, True, "", "", description)
+
+# according to truth pT
+efficiency = ROOT.TEfficiency(hist_double_t, hist_all_t)
+description = "Filled with fraction of: no. of double matched jets / total no. of matched jets of fCPV < 1; for each total truth-matched pT bin"
+title = "Probability of a matched jet being double matched for fCPV < 1; total truth-matched pT; Probability"
+plot(efficiency, False, title, ROOT.kBlue, False, True, "", "", description)
+
+# fCPV = 1
+
+# according to reco pT
+efficiency = ROOT.TEfficiency(hist_double_1, hist_all_1)
+description = "Filled with fraction of: no. of double matched jets / total no. of matched jets of fCPV = 1; for each reco pT bin"
+title = "Probability of a matched jet being double matched for fCPV = 1; reco pT; Probability"
+plot(efficiency, False, title, ROOT.kGreen, False, True, "", "", description)
+
+# according to truth pT
+efficiency = ROOT.TEfficiency(hist_double_1_t, hist_all_1_t)
+description = "Filled with fraction of: no. of double matched jets / total no. of matched jets of fCPV = 1; for each total truth-matched pT bin"
+title = "Probability of a matched jet being double matched for fCPV = 1; total truth-matched pT; Probability"
+plot(efficiency, False, title, ROOT.kGreen, False, True, "", "", description)
+
+
+# SAVE PLOTS TO PDF
 canvas.Print(outFileName+"]")
