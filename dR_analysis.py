@@ -77,6 +77,9 @@ for i in range(num_entries): # 'temp' for testing; 'num_entries' for real data
 		print(f"{i} / {num_entries}")
 	
 	inTree.GetEntry(i)
+
+	weight = inTree.event_mcEventWeight
+
 	truth_jets = []
 
 	# Loop through trutJets and truthInTimeJets and add save their basic properties in a list
@@ -99,7 +102,7 @@ for i in range(num_entries): # 'temp' for testing; 'num_entries' for real data
 	# Calculate dR between all truth jets
 	dR_matrix = [[999 for _ in range(len(truth_jets))] for _ in range(len(truth_jets))]
 	for j in range(len(truth_jets)):
-		hist_all_pt.Fill(truth_jets[j][0])
+		hist_all_pt.Fill(truth_jets[j][0], weight)
 		pt1, eta1, phi1 = truth_jets[j][0], truth_jets[j][1], truth_jets[j][2]
 		for k in range(j+1, len(truth_jets)):
 			pt2, eta2, phi2 = truth_jets[k][0], truth_jets[k][1], truth_jets[k][2]
@@ -107,11 +110,11 @@ for i in range(num_entries): # 'temp' for testing; 'num_entries' for real data
 			dR_matrix[j][k] = delta_r
 			if delta_r < 0.4:
 				ratio = max(truth_jets[j][0], truth_jets[k][0]) / min(truth_jets[j][0], truth_jets[k][0])
-				hist_deltaR_04.Fill(delta_r)
+				hist_deltaR_04.Fill(delta_r, weight)
 
 		# a jet is within dR < 0.4 of any other jet, it overlaps, therefore fill appropriate histogram with pT
 		if np.any(np.array(dR_matrix[j]) < 0.4):
-			hist_dR_pt.Fill(truth_jets[j][0])
+			hist_dR_pt.Fill(truth_jets[j][0], weight)
 
 	# Fill jets[0] with the properties of all jets of fCPV < 1, and same for fCPV = 1 in jets[1]
 	jets = [[], []]
@@ -125,31 +128,37 @@ for i in range(num_entries): # 'temp' for testing; 'num_entries' for real data
 			inTree.jet_ptFrac_dR04.at(j),
 			inTree.jet_Jvt.at(j)
 		]
+		'''
 		control = True
 		if inTree.event_truthMatrixElementVertexIndex != inTree.jet_originVertexIndex.at(j):
 			jet.append(-1)
 			control = False
+		'''
 
 		if inTree.jet_ptFrac_dR04.at(j) < 1:
 			jets[0].append(jet)
-			hist_all_fCPV.Fill(jet[0])
+			hist_all_fCPV.Fill(jet[0], weight)
+			'''
 			if control:
-				hist_all_filt.Fill(jet[0])
+				hist_all_filt.Fill(jet[0], weight)
+			'''
 
 		elif inTree.jet_ptFrac_dR04.at(j) == 1:
 			jets[1].append(jet)
-			hist_all_fCPV_1.Fill(jet[0])
+			hist_all_fCPV_1.Fill(jet[0], weight)
+			'''
 			if control:
-				hist_all_filt_1.Fill(jet[0])
+				hist_all_filt_1.Fill(jet[0], weight)
+			'''
 
 	# Process all reco jets and calculate dR WRT each other
 	for x in range(len(jets)):
 		if len(jets[x]) > 0:
 			if len(jets[x]) == 1:
 				if x == 0:
-					hist_num_deltaR.Fill(jets[x][0][0])
+					hist_num_deltaR.Fill(jets[x][0][0], weight)
 				else:
-					hist_num_deltaR_1.Fill(jets[x][0][0])
+					hist_num_deltaR_1.Fill(jets[x][0][0], weight)
 
 				continue
 
@@ -172,16 +181,13 @@ for i in range(num_entries): # 'temp' for testing; 'num_entries' for real data
 				count = sum([1 for x in dR_matrix[j] if x < 0.4])
 				if count == 0:
 					if x == 0: # fCPV < 1
-						hist_num_deltaR.Fill(pt)
+						hist_num_deltaR.Fill(pt, weight)
 					else: # fCPV = 1
-						hist_num_deltaR_1.Fill(pt)
+						hist_num_deltaR_1.Fill(pt, weight)
 
 	# Process all reco jets and calculate dR WRT truth jets, to see if the reco jets match (dR < 0.3)
 	for x in range(len(jets)):
 		for j in range(len(jets[x])):
-			if len(jets[x][j]) == 8:
-				continue
-
 			pt1, eta1, phi1, m1 = jets[x][j][0:4]
 			indices = []
 			for k in range(len(truth_jets)):
@@ -199,31 +205,31 @@ for i in range(num_entries): # 'temp' for testing; 'num_entries' for real data
 			# Depending on to what extent the reco jet matches, fill different histograms
 			if gpv_matched:
 				if x == 0: # fCPV < 1
-					hist_gpv.Fill(jets[0][j][0])
+					hist_gpv.Fill(jets[0][j][0], weight)
 
 				else: # fCPV = 1
-					hist_gpv_1.Fill(jets[1][j][0])
+					hist_gpv_1.Fill(jets[1][j][0], weight)
 
 			if np.any(pileup_matched):
 				if x == 0:
-					hist_pileup.Fill(jets[0][j][0])
+					hist_pileup.Fill(jets[0][j][0], weight)
 
 				else:
-					hist_pileup_1.Fill(jets[1][j][0])
+					hist_pileup_1.Fill(jets[1][j][0], weight)
 
 			if double_pileup:
 				if x == 0:
-					hist_double_p.Fill(jets[0][j][0])
+					hist_double_p.Fill(jets[0][j][0], weight)
 
 				else:
-					hist_double_1_p.Fill(jets[1][j][0])
+					hist_double_1_p.Fill(jets[1][j][0], weight)
 
 			if gpv_matched and np.any(pileup_matched):
 				if x == 0:
-					hist_double.Fill(jets[0][j][0])
+					hist_double.Fill(jets[0][j][0], weight)
 					
 				else:
-					hist_double_1.Fill(jets[1][j][0])
+					hist_double_1.Fill(jets[1][j][0], weight)
 
 
 # Write histograms to file
