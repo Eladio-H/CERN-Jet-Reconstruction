@@ -42,8 +42,8 @@ hist_all_filt_1 = getHist(inFile, "all_fCPV_filt_1")
 hist_double_p = getHist(inFile, "double_p")
 hist_double_1_p = getHist(inFile, "double_1_p")
 
-hist_all_incl = hist_all_filt.Clone()
-hist_all_incl.Add(hist_all_filt_1)
+hist_all_incl = hist_all_fCPV.Clone()
+hist_all_incl.Add(hist_all_fCPV_1)
 
 
 # PLOTTING FUNCTION
@@ -126,12 +126,12 @@ description = "Filled with fraction of: no. of reco jets matching a GPV jet / to
 title = "Probability of a reco jet of any fCPV match a GPV-originated jet; reco pT; Probability"
 plot(efficiency, False, title, ROOT.kRed, False, True, "", "", description)
 
-efficiency = ROOT.TEfficiency(hist_gpv, hist_all_filt)
+efficiency = ROOT.TEfficiency(hist_gpv, hist_all_fCPV)
 description = "Filled with fraction of: no. of reco jets matching a GPV jet / total no. of jets of fCPV < 1; for each reco pT bin"
 title = "Probability of a reco jet of fCPV < 1 match a GPV-originated jet; reco pT; Probability"
 plot(efficiency, False, title, ROOT.kRed, False, True, "", "", description)
 
-efficiency = ROOT.TEfficiency(hist_gpv_1, hist_all_filt_1)
+efficiency = ROOT.TEfficiency(hist_gpv_1, hist_all_fCPV_1)
 description = "Filled with fraction of: no. of reco jets matching a GPV jet / total no. of jets of fCPV = 1; for each reco pT bin"
 title = "Probability of a reco jet of fCPV = 1 match a GPV-originated jet; reco pT; Probability"
 plot(efficiency, False, title, ROOT.kRed, False, True, "", "", description)
@@ -144,25 +144,25 @@ description = "Filled with fraction of: no. of reco jets matching a pileup-origi
 title = "Probability of a reco jet of any fCPV match a pileup-originated jet; reco pT; Probability"
 plot(efficiency, False, title, ROOT.kBlue, False, True, "", "", description)
 
-efficiency = ROOT.TEfficiency(hist_pileup, hist_all_filt)
+efficiency = ROOT.TEfficiency(hist_pileup, hist_all_fCPV)
 description = "Filled with fraction of: no. of reco jets matching a pileup-originated jet / total no. of jets of fCPV < 1; for each reco pT bin"
 title = "Probability of a reco jet of fCPV < 1 match a pileup-originated jet; reco pT; Probability"
 plot(efficiency, False, title, ROOT.kBlue, False, True, "", "", description)
 
-efficiency = ROOT.TEfficiency(hist_pileup_1, hist_all_filt_1)
+efficiency = ROOT.TEfficiency(hist_pileup_1, hist_all_fCPV_1)
 description = "Filled with fraction of: no. of reco jets matching a pileup-originated jet / total no. of jets of fCPV = 1; for each reco pT bin"
 title = "Probability of a reco jet of fCPV = 1 match a pileup-originated jet; reco pT; Probability"
 plot(efficiency, False, title, ROOT.kBlue, False, True, "", "", description)
 
 
 # PLOT PROBABILITY OF A RECO JET BEING DOUBLE-MATCHED WITH fCPV < 1
-efficiency = ROOT.TEfficiency(hist_double, hist_all_filt)
+efficiency = ROOT.TEfficiency(hist_double, hist_all_fCPV)
 description = "Filled with fraction of: no. of double-matched reco jets / total no. of reco jets of fCPV < 1; for each reco pT bin"
 title = "Probability of a reco jet of fCPV < 1 to be double truth-matched; reco pT; Probability"
 plot(efficiency, False, title, ROOT.kBlack, False, True, "", "", description)
 
 # PLOT PROBABILITY OF A RECO JET BEING DOUBLE-MATCHED WITH fCPV = 1
-efficiency = ROOT.TEfficiency(hist_double_1, hist_all_filt_1)
+efficiency = ROOT.TEfficiency(hist_double_1, hist_all_fCPV_1)
 description = "Filled with fraction of: no. of double-matched reco jets / total no. of reco jets of fCPV = 1; for each reco pT bin"
 title = "Probability of a reco jet of fCPV = 1 to be double truth-matched; reco pT; Probability"
 plot(efficiency, False, title, ROOT.kBlack, False, True, "", "", description)
@@ -195,7 +195,7 @@ plot(efficiency, False, title, ROOT.kBlue, False, True, "", "", description)
 efficiency = ROOT.TEfficiency(hist_dR_pt, hist_all_pt)
 description = "Filled with fraction of: no. of truth jets that overlap / total no. of truth jets; for each truth pT bin"
 title = "Probability of a truth jet overlapping as a function of pT; truth pT; Probability"
-plot(efficiency, False, title, ROOT.kBlack, False, True, "", "", description)
+plot(efficiency, False, title, ROOT.kViolet, False, True, "", "", description)
 
 
 # SAVE PLOTS TO PDF
