@@ -91,6 +91,8 @@ for i in range(num_entries):
 
 	inTree.GetEntry(i)
 
+	weight = inTree.event_mcEventWeight
+
 	# Process the truth and reco jets in each vertex
 	for j in range(inTree.jet_truthPt.size()):
 		jet_pt_frac = inTree.jet_ptFrac_dR04.at(j) # = fCPV
@@ -126,80 +128,80 @@ for i in range(num_entries):
 				if pt_filter:
 					# Find appropriate histogram to fill, for any fCPV, and then within fCPV = 1 OR fCPV < 1
 					if is_truth_matched and not is_pileup_matched:
-						hists_pt_responses[k][0].Fill(ratio)
+						hists_pt_responses[k][0].Fill(ratio, weight)
 					if is_pileup_matched and not is_truth_matched:
-						hists_pt_responses[k][3].Fill(ratio_p)
+						hists_pt_responses[k][3].Fill(ratio_p, weight)
 					if is_pileup_matched and is_truth_matched:
-						hists_pt_responses[k][6].Fill(ratio_both)
+						hists_pt_responses[k][6].Fill(ratio_both, weight)
 
 					if jet_pt_frac == 1: # fCPV = 1
 						if is_truth_matched and not is_pileup_matched:
-							hists_pt_responses[k][2].Fill(ratio)
+							hists_pt_responses[k][2].Fill(ratio, weight)
 						if is_pileup_matched and not is_truth_matched:
-							hists_pt_responses[k][5].Fill(ratio_p)
+							hists_pt_responses[k][5].Fill(ratio_p, weight)
 						if is_pileup_matched and is_truth_matched:
-							hists_pt_responses[k][8].Fill(ratio_both)
+							hists_pt_responses[k][8].Fill(ratio_both, weight)
 
 					elif jet_pt_frac < 1: # fCPV < 1
 						if is_truth_matched and not is_pileup_matched:
-							hists_pt_responses[k][1].Fill(ratio)
+							hists_pt_responses[k][1].Fill(ratio, weight)
 						if is_pileup_matched and not is_truth_matched:
-							hists_pt_responses[k][4].Fill(ratio_p)
+							hists_pt_responses[k][4].Fill(ratio_p, weight)
 						if is_pileup_matched and is_truth_matched:
-							hists_pt_responses[k][7].Fill(ratio_both)
+							hists_pt_responses[k][7].Fill(ratio_both, weight)
 
 		# Fill the 1D fCPV histograms for: truth-matched, pileup-matched, and unfiltered
-		hist_fCPV_unf.Fill(jet_pt_frac)
+		hist_fCPV_unf.Fill(jet_pt_frac, weight)
 		if matched:
-			hist_fCPV_truth_pileup_or.Fill(jet_pt_frac)
+			hist_fCPV_truth_pileup_or.Fill(jet_pt_frac, weight)
 
 		if double_matched:
-			hist_fCPV_truth_pileup.Fill(jet_pt_frac)
+			hist_fCPV_truth_pileup.Fill(jet_pt_frac, weight)
 
 		elif is_truth_matched and not is_pileup_matched:
-			hist_fCPV_truth.Fill(jet_pt_frac)
+			hist_fCPV_truth.Fill(jet_pt_frac, weight)
 
 		elif is_pileup_matched and not is_truth_matched:
-			hist_fCPV_pileup.Fill(jet_pt_frac)
+			hist_fCPV_pileup.Fill(jet_pt_frac, weight)
 
 		
 
 		# Fill 1D pT histograms for matched truth jet(s) and reco jet
 		if matched:
-			hist_all_any.Fill(inTree.jet_pt.at(j)) # reco jet
-			hist_all_any_t.Fill(total_pt) # matched truth jet(s)
+			hist_all_any.Fill(inTree.jet_pt.at(j), weight) # reco jet
+			hist_all_any_t.Fill(total_pt, weight) # matched truth jet(s)
 
 		# Fill 1D pT histograms for matched truth jets and reco jet which is DOUBLE matched
 		if double_matched:
-			hist_double_any.Fill(inTree.jet_pt.at(j))
-			hist_double_any_t.Fill(total_pt)
+			hist_double_any.Fill(inTree.jet_pt.at(j), weight)
+			hist_double_any_t.Fill(total_pt, weight)
 
 			# Also, fill 2D pT histogram of leading and subleading jet pTs of both truth jets that work to form the reco jet (also for fCPV = 1, < 1, and inclusive)
 			leading = max(truthJet_pt, truthPileupJet_pt)
 			sleading = min(truthJet_pt, truthPileupJet_pt)
 
-			hist_pt_comparison_any.Fill(leading, sleading)
+			hist_pt_comparison_any.Fill(leading, sleading, weight)
 			if (jet_pt_frac == 1):
-				hist_pt_comparison_1.Fill(leading, sleading)
+				hist_pt_comparison_1.Fill(leading, sleading, weight)
 			elif (jet_pt_frac < 1):
-				hist_pt_comparison.Fill(leading, sleading)
+				hist_pt_comparison.Fill(leading, sleading, weight)
 
 		# Fill 1D pT histograms for matched truth jet(s) and reco jet as well as for the jets that are double matched, for fCPV = 1 and fCPV < 1
 		if jet_pt_frac < 1:
 			if matched:
-				hist_all.Fill(inTree.jet_pt.at(j))
-				hist_all_t.Fill(total_pt)
+				hist_all.Fill(inTree.jet_pt.at(j), weight)
+				hist_all_t.Fill(total_pt, weight)
 			if (double_matched):
-				hist_double.Fill(inTree.jet_pt.at(j))
-				hist_double_t.Fill(total_pt)
+				hist_double.Fill(inTree.jet_pt.at(j), weight)
+				hist_double_t.Fill(total_pt, weight)
 
 		elif jet_pt_frac == 1:
 			if matched:
-				hist_all_1.Fill(inTree.jet_pt.at(j))
-				hist_all_1_t.Fill(total_pt)
+				hist_all_1.Fill(inTree.jet_pt.at(j), weight)
+				hist_all_1_t.Fill(total_pt, weight)
 			if (double_matched):
-				hist_double_1.Fill(inTree.jet_pt.at(j))
-				hist_double_1_t.Fill(total_pt)
+				hist_double_1.Fill(inTree.jet_pt.at(j), weight)
+				hist_double_1_t.Fill(total_pt, weight)
 
 
 # Write all histograms to root file
