@@ -45,9 +45,6 @@ hist_all_t = getHist(inFile, "all_t")
 hist_double_1_t = getHist(inFile, "double_1_t")
 hist_all_1_t = getHist(inFile, "all_1_t")
 
-hist_num_deltaR = getHist(inFile, "num_deltaR")
-hist_all_fCPV = getHist(inFile, "all_fCPV")
-
 # In a loop, load the all pT response histograms for all the ranges into 'hists_pt_responses'
 hists_pt_responses = []
 ranges = [[20.e3, 25.e3], [25.e3, 30.e3], [30.e3, 40.e3]]
